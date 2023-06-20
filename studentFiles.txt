@@ -1,0 +1,5 @@
+Srujan, VIT,100,97,89,95,80
+Rahul, BVRIT,100,89,98,88,70
+Mahatma,PES,90,09,89,70,99
+Indra,BVRIT,29,44,55,34,90
+Narendra,NIT,99,98,90,99,79
