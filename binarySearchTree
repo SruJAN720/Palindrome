@@ -1,0 +1,205 @@
+class Tree:
+    def __init__(self,data,left,right):
+        self.data = data
+        self.left = left
+        self.right = right
+    
+    def set_left(self,left):
+        self.left = left
+
+    def get_left(self):
+        return self.left 
+
+    def get_right(self):
+        return self.right 
+
+    def printData(self):
+        print("NODE ",self.data)
+
+    def set_right(self, right):
+        self.right = right 
+
+    def add_relation(self,left,right):
+        self.set_left(left)
+        self.set_right(right)
+
+    def dfs(self):
+        if self.left:
+            self.left.dfs()
+        self.printData()
+        if self.right:
+            self.right.dfs()
+    
+    def bfs(self):
+        self.printData()
+        if self.left:
+            self.left.bfs()
+        if self.right:
+            self.right.bfs()
+    
+    def postFix(self):
+        if self.left:
+            self.left.bfs()
+        if self.right:
+            self.right.bfs()
+        self.printData()
+        
+    def postFixData(self):
+        datalist = [] 
+        if self.left:
+            datalist += self.left.postFixData()
+        if self.right:
+            datalist += self.right.postFixData()
+        datalist.append(self.data)
+        return datalist 
+
+## 10 -> 8, 15
+#  15 -> 13,None
+def sampleData():
+    node1 = Tree(10,None,None)
+    leftNode1 = Tree(8,None,None)
+    rightNode1 = Tree(15,None,None)
+    rightNode2 = Tree(13,None,None)
+    node1.add_relation(leftNode1,rightNode1)
+    rightNode1.add_relation(rightNode2,None)
+    print("Printing DFS")
+    node1.dfs()
+    print("Printing BFS")
+    node1.bfs()
+
+print(sampleData())
+
+
+## operators = [ '+','-']
+# opRankDict = { '+':1,'-':1}
+## nodeList =  [GeeratteTree (token ) for token in tokenization(exp)]
+
+## 
+def Tree_Generation(token):
+    return Tree(token,None,None)
+
+def getOpDict():
+    return {"+":1,"-":1,"*":2,"/":2}
+def getOperatos():
+    dct = getOpDict()
+    return list(dct.keys())
+
+def operator_rank(op):
+    OpRank = getOpDict()
+    if op in OpRank:
+        return OpRank[op]
+    else:
+        return 100 
+    
+
+
+def get_least_op_pos(exp_list):
+    loc = -1 
+    op = None 
+    ## lopping backward
+    for pos in range(len(exp_list)-1,0,-1):
+        if exp_list[pos] in getOperatos():
+            if operator_rank(exp_list[pos]) < operator_rank(op):
+                op = exp_list[pos]
+                loc = pos 
+    return op,loc 
+#              {10}
+#           {8}     {15}
+#                 {13}
+
+exp = "2+3-4+55-6*3/2"
+exp1 = " 2* 3 + 7 "
+exp2 = "2 +3 * 7"
+        
+def generate_Tree(exp_split): 
+
+    if len(exp_split) <= 0:
+        print("BAD INPUT")
+        return None 
+    if len(exp_split) ==1:
+            print(" ONE ELEMENT ", exp_split)
+            return Tree(exp_split[0],None,None)
+    print( "exp : {}, len ".format(exp_split,len(exp_split)))
+    op,pos = get_least_op_pos(exp_split)
+    node = Tree(op,None,None)    
+    node.set_left( generate_Tree(exp_split[0:pos]))
+    node.set_right(generate_Tree(exp_split[pos+1:]))
+    
+    return node 
+    
+def evaluate(node):
+     
+     """ if node.get_left() in getOperatos:
+            evaluate(node.get_left)
+        else:
+            left = node.get_left 
+            right = node.get_right
+            if node == '+':
+                node.set_left(generate_Tree(left+right))
+            elif node == '-':
+                node.set_left(generate_Tree(left-right))
+            elif node == '*':
+                node.set_left(generate_Tree(left*right))
+            elif node == '/':
+                node.set_left(generate_Tree(left/right)) """
+       
+
+def arithematic_Data(exp):
+    exp_split= []
+    pre = 0
+    for i in range(len(exp)):
+        if exp[i] in getOperatos():
+            exp_split.append(int((exp[pre:i])))
+            pre = i + 1
+            exp_split.append(exp[i])
+    exp_split.append(int(exp[pre:]))
+    print( " Tokens ", exp_split, len(exp_split))
+    nodeList = []
+    for i in range(len(exp_split)):
+        nodeList.append(Tree_Generation(exp_split[i]))
+    print(" Nodes ",len(nodeList))
+    for node in nodeList:
+        pass 
+        #print(node.printData())    
+    op,pos = get_least_op_pos(exp_split)
+    print( " POS {} , op {} ".format(pos,op))
+    node = generate_Tree(exp_split)
+    node.dfs()
+    print("Postfix")
+    pd = node.postFixData()
+    print(pd)
+    #Evaluate the Node
+    dataListed = node.postFixData()
+    print(dataListed)
+    #dataListed = [2,3,1,'*','+',9,'-']
+    #dataListed= [2,3,'*',7,'+'] ##  2 * 3 + 7 = 13
+    #dataListed = [2,3,7,'*','+'] # (2 + 3 * 7)  = 23
+    numStack = []
+    for i in range(len(dataListed)):
+        if type(dataListed[i]) == int:
+            numStack.append(dataListed[i])
+        elif dataListed[i] in getOperatos():
+            right = numStack.pop()
+            #print(right)
+            left = numStack.pop()
+            #print(left)
+            operator = dataListed[i]
+            print("Working on operator ",left,operator, right)
+            if operator == '+':
+                numStack.append(left+right)
+            elif operator == '-':
+                numStack.append(left-right)
+            elif operator == '*':
+                numStack.append(left*right)
+            elif operator == '/':
+                numStack.append(left/right)
+            print(numStack)
+    
+    print(numStack)  
+            
+    #evaluate(node)
+## this dictoionary will save operator and rank 
+
+
+arithematic_Data(exp2)
+#https://www.youtube.com/watch?v=2Z6g3kNymd0
